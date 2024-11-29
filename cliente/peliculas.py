@@ -21,6 +21,7 @@ def listar_peliculas():
     else:
         print("Error al obtener peliculas")
 
+
 ##BUSCAR POR ID
 def buscar_pelicula():
     os.system('clear')
@@ -33,6 +34,13 @@ def buscar_pelicula():
 
     else: 
         print("No existe esa pelicula!")
+
+
+##buscar por nombre
+def buscar_por_nombre():
+    os.system('clear')
+    nombre_aprox= input("Ingrese el nombre de la pelicula")
+    respuesta = requests.get()
 
 
 ##AGREGAR PELICULA#

@@ -1,7 +1,7 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from db import get_DB
 from modelos import Pelicula
-from motor.motor_asyncio import AsyncIOMotorClient
+from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 from bson import ObjectId
 
 
@@ -36,6 +36,37 @@ async def listar_peliculas():
     return resultados
 
 
+ @app.get("/peliculas/busqueda")
+async def buscar_titulo(titulo: str = Query(..., description="Titulo de la pelicula: ")):
+    print(f"Título recibido: {titulo}")
+    db = await get_DB()
+
+    busqueda = await db.peliculas.find_one({"titulo": titulo})
+
+    if not busqueda:
+        raise HTTPException(status_code=404, detail="Película no encontrada")
+    
+    busqueda["_id"] = str(busqueda["_id"])
+    return busqueda 
+
+
+##Comentado hasta usar routers, ya que genera conflicto"
+""" @app.get("/peliculas/busqueda")
+async def buscar_titulo(titulo: str = Query(..., description="Titulo de la pelicula: ")):
+    print(f"Título recibido: {titulo}")
+    db: AsyncIOMotorDatabase = await get_DB()
+
+    busqueda = await db.peliculas.find(
+        {"titulo": {"$regex": titulo, "$options":"i"}}
+        ).to_list(100)
+
+    if not busqueda:
+        raise HTTPException(status_code=404, detail="Película no encontrada")
+    
+    busqueda["_id"] = str(busqueda["_id"])
+    return busqueda
+ """
+
 @app.get("/peliculas/{id}", response_model=Pelicula)
 async def buscar(id: str):
     db = await get_DB()
@@ -48,6 +79,13 @@ async def buscar(id: str):
     busqueda["_id"] = str(busqueda["_id"])
 
     return busqueda
+
+
+
+
+
+
+
 
 ##################################################
 #UPDATE
